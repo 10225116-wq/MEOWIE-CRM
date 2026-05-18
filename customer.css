@@ -1,0 +1,576 @@
+:root {
+    --customer-bg: #f9f9f9;
+    --customer-card: #ffffff;
+    --customer-text: #1a1a1a;
+    --customer-muted: #8e8e93;
+    --customer-accent: #34c759; /* Green from the Figma icons, or generic */
+    --customer-border: #e5e5ea;
+    --font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body.customer-body {
+    background-color: var(--customer-bg);
+    min-height: 100vh;
+    margin: 0;
+    font-family: var(--font-family);
+}
+
+/* Responsive App Frame */
+.mobile-frame {
+    width: 100%;
+    height: 100vh;
+    background-color: var(--customer-bg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+/* Responsive Design Utilities */
+.responsive-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* Header */
+.customer-header {
+    background-color: var(--customer-bg);
+    border-bottom: 1px solid var(--customer-border);
+    width: 100%;
+    z-index: 10;
+}
+
+.header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    gap: 12px;
+}
+
+.search-bar-mobile {
+    width: 100%;
+    max-width: 300px; /* Limit search bar width on wide screens */
+    padding: 8px 15px;
+    background-color: #eef0f2;
+    border-radius: 10px;
+    border: none;
+    font-family: var(--font-family);
+    outline: none;
+}
+
+/* Content Area */
+.mobile-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 20px;
+    padding-bottom: 80px; /* Space for bottom nav */
+}
+
+/* Categories & Products (Home Tab) */
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.categories-list {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+
+.category-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #eef0f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 24px;
+}
+
+.category-name {
+    font-size: 12px;
+    color: var(--customer-text);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.product-card {
+    background-color: var(--customer-card);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.product-img {
+    width: 100%;
+    height: 120px;
+    background-color: #eef0f2;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-size: cover;
+    background-position: center;
+}
+
+.product-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.product-price {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Chat Support Tab */
+.chat-bot-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--customer-border);
+}
+
+.chat-bot-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #eab308; /* Yellow/orange for Meowie */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+#tab-chat.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 145px); /* 100vh minus header and bottom-nav heights */
+}
+
+.chat-layout-container {
+    display: flex;
+    flex-direction: column;
+    height: 220%;
+    width: 150%;
+    box-sizing: border-box;
+}
+
+.chat-messages-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    flex: 1; /* Take up all remaining space */
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+.msg-mobile {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.msg-mobile.outgoing {
+    align-self: flex-end;
+    background-color: #000;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.msg-mobile.incoming {
+    align-self: flex-start;
+    background-color: #eef0f2;
+    color: var(--customer-text);
+    border-bottom-left-radius: 4px;
+}
+
+.chat-input-mobile {
+    background-color: var(--customer-bg);
+    padding: 16px 0;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chat-input-mobile input {
+    flex: 1;
+    padding: 18px 24px; /* 2x height and width spacing */
+    border-radius: 28px;
+    border: 1.5px solid var(--customer-border);
+    outline: none;
+    font-size: 16px; /* Larger text */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: all 0.25s ease;
+}
+
+.chat-input-mobile input:focus {
+    border-color: var(--customer-accent);
+    box-shadow: 0 4px 18px rgba(52, 199, 89, 0.12);
+    background-color: #ffffff;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: var(--customer-card);
+    border-top: 1px solid var(--customer-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 15px; /* For iPhone home bar */
+    z-index: 20;
+}
+
+.bottom-nav-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 600px; /* Restrict width of bottom tab icons on desktop */
+}
+
+.nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--customer-muted);
+    text-decoration: none;
+    font-size: 10px;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-tab.active {
+    color: #000;
+}
+
+.nav-tab i {
+    font-size: 22px;
+}
+
+/* Tab Switching Logic */
+.mobile-tab-content {
+    display: none;
+}
+.mobile-tab-content.active {
+    display: block;
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Profile Tab Styles */
+.profile-header-card {
+    background: linear-gradient(135deg, var(--customer-accent), #28a745);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(52, 199, 89, 0.15);
+}
+
+.avatar-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    margin-bottom: 12px;
+    border: 2px solid #ffffff;
+}
+
+.profile-greeting {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.profile-sub {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.profile-menu-list {
+    background-color: var(--customer-card);
+    border-radius: 16px;
+    border: 1px solid var(--customer-border);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.profile-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid var(--customer-border);
+}
+
+.profile-menu-item:last-child {
+    border-bottom: none;
+}
+
+.profile-menu-item:hover {
+    background-color: #f6f8fa;
+}
+
+.menu-item-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-icon {
+    font-size: 18px;
+    color: var(--customer-accent);
+    width: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.logout-menu-item .menu-icon {
+    color: #e53e3e;
+}
+
+.logout-menu-item {
+    color: #e53e3e;
+}
+
+.logout-menu-item:hover {
+    background-color: #fff5f5;
+}
+
+.menu-label {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.menu-arrow {
+    font-size: 12px;
+    color: var(--customer-muted);
+}
+
+/* Personal Info Detail Sub-Page */
+.profile-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--customer-border);
+}
+
+.back-btn-profile {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--customer-accent);
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-detail-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.detail-card {
+    background-color: var(--customer-card);
+    border-radius: 16px;
+    border: 1px solid var(--customer-border);
+    padding: 20px;
+}
+
+.detail-field {
+    margin-bottom: 16px;
+}
+
+.detail-field:last-child {
+    margin-bottom: 0;
+}
+
+.detail-field label {
+    display: block;
+    font-size: 12px;
+    color: var(--customer-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.detail-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--customer-text);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--customer-border);
+}
+
+.detail-value-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--customer-border);
+}
+
+.detail-value-wrapper input {
+    border: none;
+    background: none;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--customer-text);
+    outline: none;
+    flex: 1;
+    font-family: inherit;
+}
+
+.toggle-pwd-btn {
+    background: none;
+    border: none;
+    color: var(--customer-muted);
+    cursor: pointer;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.toggle-pwd-btn:hover {
+    color: var(--customer-accent);
+}
+
+/* Logout Modal Styles */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.modal-overlay.hidden {
+    display: none !important;
+    opacity: 0;
+}
+
+.modal-card {
+    background-color: var(--customer-card);
+    width: 85%;
+    max-width: 320px;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    text-align: center;
+    animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--customer-text);
+    line-height: 1.4;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.modal-btn.btn-secondary {
+    background-color: #ffffff;
+    border: 1.5px solid var(--customer-accent);
+    color: var(--customer-accent);
+}
+
+.modal-btn.btn-secondary:hover {
+    background-color: rgba(52, 199, 89, 0.05);
+}
+
+.modal-btn.btn-primary {
+    background-color: var(--customer-accent);
+    color: #ffffff;
+}
+
+.modal-btn.btn-primary:hover {
+    background-color: #2bb04c;
+}
+
+.hidden {
+    display: none !important;
+}
