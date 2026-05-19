@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --auth-bg: #ffffff;
+    --auth-accent: #f97316; /* Orange */
+    --auth-text: #333333;
+    --auth-input-bg: #f8fafc;
+    --auth-border: #e2e8f0;
+    --font-family: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--auth-bg);
+    color: var(--auth-text);
+    min-height: 100vh;
+    display: flex;
+}
+
+/* Split Layout */
+.auth-left {
+    flex: 1;
+    background: radial-gradient(circle at 0% 0%, #facc15 0%, #1e1b4b 50%, #090d16 100%); /* Yellow / Gold glow in top-left fading to deep space black */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Concentric Circles 1 (Top Left) */
+.auth-left::before {
+    content: '';
+    position: absolute;
+    width: 900px;
+    height: 900px;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+        circle,
+        rgba(250, 204, 21, 0.04),
+        rgba(250, 204, 21, 0.04) 1px,
+        transparent 1px,
+        transparent 35px
+    );
+    top: -300px;
+    left: -300px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Concentric Circles 2 (Bottom Right) */
+.auth-left::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+        circle,
+        rgba(249, 115, 22, 0.05),
+        rgba(249, 115, 22, 0.05) 1px,
+        transparent 1px,
+        transparent 25px
+    );
+    bottom: -150px;
+    right: -150px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Brand Container Styles */
+.brand-container {
+    text-align: center;
+    color: white;
+    z-index: 5;
+    position: relative;
+    padding: 20px;
+}
+
+.brand-glow {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.25) 0%, transparent 70%);
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(25px);
+    z-index: -1;
+}
+
+.brand-logo {
+    font-size: 72px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.3));
+    animation: floating 3s ease-in-out infinite;
+}
+
+.brand-name {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #facc15, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.brand-tagline {
+    font-size: 14px;
+    color: #94a3b8;
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.auth-right {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    justify-content: center; /* Center horizontally within its space */
+    align-items: center;     /* Center vertically */
+    padding: 40px;
+    background-color: var(--auth-bg);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.02);
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-title {
+    color: var(--auth-accent);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--auth-text);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--auth-border);
+    border-radius: 8px;
+    background-color: var(--auth-input-bg);
+    font-family: var(--font-family);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--auth-accent);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--auth-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.auth-btn:hover {
+    background-color: #ea580c; /* Darker orange */
+}
+
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.auth-links a {
+    color: var(--auth-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
