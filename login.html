@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Meowie CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-left">
+        <div class="brand-container">
+            <div class="brand-glow"></div>
+            <div class="brand-logo" style="margin-bottom: 20px;">
+                <img src="logo.jpg" alt="MEOWIE-CRM" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #facc15; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); animation: floating 3s ease-in-out infinite;">
+            </div>
+            <h2 class="brand-name">Meowie CRM</h2>
+            <p class="brand-tagline">Secure, Intelligent, and Elegant Management</p>
+        </div>
+    </div>
+    
+    <div class="auth-right">
+        <div class="auth-form-container">
+            <h1 class="auth-title">Welcome to MEOWIE-CRM</h1>
+            
+            <form id="login-form">
+                <div id="error-message" style="color: red; margin-bottom: 10px; display: none;"></div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Login as:</label>
+                    <select id="login-role" style="width: 100%; padding: 12px 15px; border: 1px solid var(--auth-border); border-radius: 8px; background-color: var(--auth-input-bg); font-family: var(--font-family); outline: none;">
+                        <option value="customer">Customer</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="auth-btn">Login</button>
+            </form>
+            
+            <div class="auth-links">
+                <span>Don't have an account yet? </span>
+                <a href="signup.html">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const selectedRole = document.getElementById('login-role').value;
+            const errorMsg = document.getElementById('error-message');
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', selectedRole); // Override with selected role
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('password', password);
+                    if (data.department) localStorage.setItem('department', data.department);
+                    else localStorage.removeItem('department');
+                    
+                    if (selectedRole === 'manager') {
+                        window.location.href = 'index.html';
+                    } else {
+                        window.location.href = 'customer.html';
+                    }
+                } else {
+                    errorMsg.textContent = data.error || 'Login failed';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Server error. Is the backend running?';
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
