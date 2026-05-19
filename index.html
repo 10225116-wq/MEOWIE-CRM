@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meowie CRM - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Outfit', sans-serif; font-feature-settings: "tnum" 1, "lnum" 1; }
+        .ai-badge { animation: pulse-badge 2s ease-in-out infinite; }
+        @keyframes pulse-badge { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0.3)} 50%{box-shadow:0 0 0 6px rgba(249,115,22,0)} }
+        .thinking-dot { animation: blink 1.2s ease-in-out infinite; }
+        .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+        .slide-in { animation: slideIn 0.35s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .status-bar-anim { transition: width 0.6s cubic-bezier(.22,1,.36,1); }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+        .nav-btn.active { background: linear-gradient(135deg,#f97316,#fb923c); color: white; box-shadow: 0 4px 12px rgba(249,115,22,0.35); }
+        .nav-btn { transition: all 0.18s; }
+        .card-hover { transition: box-shadow 0.2s, transform 0.2s; }
+        .card-hover:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.07); transform: translateY(-1px); }
+
+        /* iOS Toggle Switch */
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 44px;
+          height: 24px;
+          flex-shrink: 0;
+        }
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background-color: #ccc;
+          transition: .4s;
+          border-radius: 24px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+        }
+        input:checked + .slider {
+          background-color: #22c55e;
+        }
+        input:checked + .slider:before {
+          transform: translateX(20px);
+        }
+
+        /* Mini Fireworks Decor */
+        .mini-fireworks-decor {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .firework-spark {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: burst-animation 3s infinite ease-out;
+            animation-delay: var(--d);
+        }
+        .firework-spark.gold { background-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
+        .firework-spark.purple { background-color: #a855f7; box-shadow: 0 0 10px #a855f7; }
+        .firework-spark.red { background-color: #ef4444; box-shadow: 0 0 10px #ef4444; }
+        .firework-spark.green { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+        @keyframes burst-animation {
+            0% {
+                transform: translate(-50%, -50%) scale(0.1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            40% {
+                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
+                opacity: 1;
+            }
+            70%, 100% {
+                transform: translate(calc(-50% + var(--x) * 1.4), calc(-50% + var(--y) * 1.4)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Manager Dark Theme Overrides */
+        #app.dark-theme {
+            --app-bg: #09090b !important;
+            --card-bg: #18181b !important;
+            --border-color: #27272a !important;
+            --text-main: #f4f4f5 !important;
+            --text-muted: #a1a1aa !important;
+            background-color: #09090b !important;
+            color: #f4f4f5 !important;
+        }
+        #app.dark-theme .bg-white {
+            background-color: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .border-slate-100,
+        #app.dark-theme .border-slate-50,
+        #app.dark-theme .border-slate-200 {
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .text-slate-900,
+        #app.dark-theme .text-slate-800,
+        #app.dark-theme .text-slate-700,
+        #app.dark-theme .text-slate-600 {
+            color: #f4f4f5 !important;
+        }
+        #app.dark-theme .text-slate-500,
+        #app.dark-theme .text-slate-400 {
+            color: #a1a1aa !important;
+        }
+        #app.dark-theme .bg-slate-50,
+        #app.dark-theme .bg-slate-100,
+        #app.dark-theme .bg-slate-50\/50,
+        #app.dark-theme .bg-slate-50\/40,
+        #app.dark-theme .bg-slate-50\/20,
+        #app.dark-theme .bg-slate-50\/30 {
+            background-color: #1e1e24 !important;
+        }
+        #app.dark-theme .top-header,
+        #app.dark-theme .sidebar {
+            background-color: #09090b !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .logo-text,
+        #app.dark-theme .page-title,
+        #app.dark-theme .nav-item {
+            color: #f4f4f5 !important;
+        }
+        #app.dark-theme .nav-item:hover {
+            background-color: #18181b !important;
+        }
+        #app.dark-theme .nav-item.active {
+            background-color: #27272a !important;
+        }
+        #app.dark-theme input {
+            background-color: #18181b !important;
+            color: #f4f4f5 !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .data-table th {
+            background-color: #1e1e24 !important;
+            color: #f4f4f5 !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .data-table td {
+            color: #f4f4f5 !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .chat-container {
+            background-color: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .incoming .bubble {
+            background-color: #27272a !important;
+            color: #f4f4f5 !important;
+        }
+        #app.dark-theme #mgr-chat-scroll {
+            background-color: #09090b !important;
+        }
+        #app.dark-theme .chat-input-area {
+            background-color: #18181b !important;
+        }
+        #app.dark-theme .top-header header,
+        #app.dark-theme header {
+            background-color: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme .bg-white.border-r {
+            background-color: #18181b !important;
+            border-color: #27272a !important;
+        }
+        #app.dark-theme #sidebar-username {
+            color: #ffffff !important;
+        }
+        #app.dark-theme #page-title {
+            color: #ffffff !important;
+        }
+        #app.dark-theme .bg-slate-900 {
+            background-color: #09090b !important;
+            border: 1px solid #27272a !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 overflow-auto">
+<div id="app" class="flex h-screen bg-slate-50 text-slate-800 overflow-auto">
+    <!-- Mini Fireworks Decoration -->
+    <div class="mini-fireworks-decor">
+        <div class="firework-spark gold" style="--d: 0s; --x: 18px; --y: -18px;"></div>
+        <div class="firework-spark purple" style="--d: 0.3s; --x: -22px; --y: -8px;"></div>
+        <div class="firework-spark red" style="--d: 0.6s; --x: 8px; --y: 20px;"></div>
+        <div class="firework-spark green" style="--d: 0.9s; --x: -12px; --y: -22px;"></div>
+        <div class="firework-spark gold" style="--d: 1.2s; --x: 20px; --y: 10px;"></div>
+        <div class="firework-spark purple" style="--d: 1.5s; --x: -15px; --y: 18px;"></div>
+        <div class="firework-spark red" style="--d: 1.8s; --x: 10px; --y: -25px;"></div>
+        <div class="firework-spark green" style="--d: 2.1s; --x: -25px; --y: -15px;"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-white border-r border-slate-100 flex flex-col flex-shrink-0 shadow-sm">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-50">
+            <img src="logo.jpg" alt="Meowie CRM" class="w-10 h-10 rounded-2xl object-cover border-2 border-orange-300 shadow-sm" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ffedd5%22/><text x=%2250%22 y=%2255%22 font-family=%22Arial%22 font-size=%2240%22 font-weight=%22bold%22 fill=%22%23ea580c%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>M</text></svg>'">
+            <div>
+                <span class="font-display font-bold text-base text-slate-900 block leading-tight">Meowie CRM</span>
+                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Admin Panel</span>
+            </div>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1" id="menu"></nav>
+        <div class="p-4 border-t border-slate-100">
+            <div class="bg-slate-900 rounded-2xl p-4 text-white">
+                <p class="text-[10px] text-slate-500 mb-1 uppercase tracking-wider font-semibold">Signed in as</p>
+                <p class="text-sm font-bold font-display" id="sidebar-username">Manager</p>
+                <p class="text-[10px] text-orange-400 font-medium mt-1" id="sidebar-department">—</p>
+                <div class="mt-3 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                    <span class="text-[10px] text-slate-400 font-medium">System Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between shadow-sm">
+            <h2 class="text-lg font-display font-bold text-slate-900" id="page-title">Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search..." class="bg-slate-100 rounded-full py-2 pl-9 pr-4 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all" />
+                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <div class="relative">
+                    <button id="btn-notifications" onclick="toggleNotifications()" class="relative p-2 text-slate-400 hover:text-orange-500 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span id="notif-badge" class="hidden absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden slide-in">
+                        <div class="p-4 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                            <span class="font-display font-bold text-sm text-slate-800">Notifications</span>
+                            <span id="notif-count-badge" class="px-2 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-lg">0 New</span>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto p-2">
+                            <!-- JS will populate this -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 overflow-auto p-8" id="content"></main>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal" class="hidden fixed inset-0 items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+    <div class="bg-white rounded-3xl w-full max-w-2xl p-6 shadow-2xl mx-4 slide-in">
+        <div class="flex items-center justify-between mb-5">
+            <h3 id="edit-modal-title" class="text-base font-display font-bold text-slate-900">Edit</h3>
+            <button onclick="closeEditModal()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 text-sm transition-colors">✕</button>
+        </div>
+        <div id="edit-modal-body" class="text-sm text-slate-700"></div>
+    </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div id="logout-modal" class="hidden fixed inset-0 items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+    <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl mx-4 slide-in text-center">
+        <h3 class="text-lg font-display font-bold text-slate-900 mb-2">Log out</h3>
+        <p class="text-sm text-slate-500 mb-6">Are you sure you want to log out of your manager account?</p>
+        <div class="flex gap-3">
+            <button onclick="hideLogoutConfirm()" class="flex-1 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+            <button onclick="executeLogout()" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition-colors">Log Out</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================================================================
+// PAGE STATE
+// ================================================================
+const menuItems = [
+    { name: 'Dashboard', icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-3a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/></svg>` },
+    { name: 'Feedback', icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>` },
+    { name: 'Process', icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>` },
+    { name: 'Settings', icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>` },
+    { name: 'Chat', icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>` }
+];
+
+let currentTab = 'Dashboard';
+let selectedCategory = 'Shipping';
+let newKeywordInput = '';
+let activeChat = '';
+let typedMessage = '';
+let modalState = { type: null, category: null, issue: null };
+let feedbackList = [];
+const chatMessagesBySlug = {};
+
+function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function authHeaders() {
+    return { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' };
+}
+async function loadFeedback() {
+    try {
+        const res = await fetch('/api/feedback', { headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) return;
+        feedbackList = data.items || [];
+        updateNotifications();
+    } catch (e) { console.warn('loadFeedback', e); }
+}
+
+function updateNotifications() {
+    const newTickets = feedbackList.filter(f => f.status === 'Not contact yet');
+    const badge = document.getElementById('notif-badge');
+    const countBadge = document.getElementById('notif-count-badge');
+    const list = document.getElementById('notif-list');
+    
+    if (newTickets.length > 0) {
+        badge.classList.remove('hidden');
+        countBadge.textContent = `${newTickets.length} New`;
+        list.innerHTML = newTickets.map(t => `
+            <div class="p-3 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border-b border-slate-50 last:border-0" onclick="switchPage('Feedback')">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-xs font-bold text-slate-800">${escapeHtml(t.user)}</span>
+                    <span class="text-[9px] text-slate-400">${escapeHtml(t.time)}</span>
+                </div>
+                <p class="text-[10px] text-slate-500 truncate">New ticket ${escapeHtml(t.id)}: ${escapeHtml(t.issue)}</p>
+            </div>
+        `).join('');
+    } else {
+        badge.classList.add('hidden');
+        countBadge.textContent = '0 New';
+        list.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">You currently have no notifications.</div>`;
+    }
+}
+
+function toggleNotifications() {
+    const dropdown = document.getElementById('notif-dropdown');
+    dropdown.classList.toggle('hidden');
+    
+    const newTickets = feedbackList.filter(f => f.status === 'Not contact yet');
+    const dept = localStorage.getItem('department') || 'All';
+    console.log(`[Notification Clicked] Department: ${dept}. Pending tickets count: ${newTickets.length}`, newTickets);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('notif-dropdown');
+    const btn = document.getElementById('btn-notifications');
+    if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+function getManagerChannelConfig() {
+    const d = (localStorage.getItem('department') || '').trim();
+    const row = (slug, label, color) => ({ slug, label, color });
+    if (d === 'Head of Manager') {
+        return [
+            row('logistics', 'Logistics', 'bg-blue-500'),
+            row('quality_assurance', 'Quality Assurance', 'bg-purple-500'),
+            row('finance', 'Finance', 'bg-emerald-500'),
+            row('it_support', 'IT support', 'bg-rose-500'),
+            row('crm_manager', 'CRM manager', 'bg-slate-600'),
+        ];
+    }
+    const m = {
+        'Logistics': [row('logistics', 'Logistics', 'bg-blue-500')],
+        'Quality Assurance': [row('quality_assurance', 'Quality Assurance', 'bg-purple-500')],
+        'Finance': [row('finance', 'Finance', 'bg-emerald-500')],
+        'IT support': [row('it_support', 'IT support', 'bg-rose-500')],
+        'CRM manager': [row('crm_manager', 'CRM manager', 'bg-slate-600')],
+    };
+    return m[d] || [];
+}
+function captureChatDraft() {
+    const el = document.getElementById('mgr-chat-input');
+    if (el) typedMessage = el.value;
+}
+async function loadChatMessages(slug) {
+    try {
+        const res = await fetch('/api/chat/' + slug + '/messages', { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok) { chatMessagesBySlug[slug] = []; return; }
+        chatMessagesBySlug[slug] = data.messages || [];
+    } catch (e) {
+        chatMessagesBySlug[slug] = [];
+    }
+}
+async function setActiveChatSlug(slug) {
+    activeChat = slug;
+    await loadChatMessages(slug);
+    renderContent();
+}
+async function handleSendChatMessage() {
+    captureChatDraft();
+    if (!typedMessage.trim() || !activeChat) return;
+    const body = typedMessage.trim();
+    typedMessage = '';
+    try {
+        await fetch('/api/chat/' + activeChat + '/messages', {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ message: body }),
+        });
+        await loadChatMessages(activeChat);
+    } catch (e) { console.warn(e); }
+    renderContent();
+}
+
+// ================================================================
+// CLASSIFICATION (keyword rules; OpenAI runs on backend via /api/ai-chat)
+// ================================================================
+function classifyFeedback(text) {
+    const textLower = text.toLowerCase();
+    for (const [category, data] of Object.entries(taxonomy)) {
+        if (category === 'Others') continue;
+        for (const [issue, keywords] of Object.entries(data.issues)) {
+            for (const word of keywords) {
+                if (textLower.includes(word.toLowerCase())) {
+                    return { category, issue, dept: data.department, matchedWord: word, confidence: null };
+                }
+            }
+        }
+    }
+    return { category: 'Others', issue: 'Not detected', dept: 'CRM Management', matchedWord: null, confidence: null };
+}
+
+// ================================================================
+// DATA (taxonomy for local pattern editor only)
+// ================================================================
+let taxonomy = {
+    Shipping: { department: 'Logistics Team', issues: { 'Late Delivery': ['delay', 'still hasn\'t arrived', 'overdue', 'stuck', 'waiting', 'slow', 'tracking'], 'Package arrived damaged': ['broken box', 'crushed', 'smashed', 'damaged', 'wet', 'torn'] } },
+    Quality: { department: 'Quality Assurance Team', issues: { 'Defective Product': ['faulty', 'snapped', 'dead', 'broken', 'ripped', 'shattered'], 'Wrong Item': ['not what I ordered', 'incorrect size', 'wrong color', 'mistake'] } },
+    Refund: { department: 'Finance Team', issues: { 'Amount Mismatch': ['short', 'missing dollars', 'wrong math', 'partial', 'charged twice'] } },
+    Technical: { department: 'IT / Dev Team', issues: { 'App Crash': ['frozen', 'crash', 'glitch', 'error', 'loading screen', 'blank'], 'Checkout and payment': ['payment', 'checkout', 'promo', 'invalid', 'declined', 'gateway'] } },
+    Others: { department: 'CRM Management', issues: { 'Uncategorized': ['question', 'assistance', 'general inquiry'] } }
+};
+// ================================================================
+// AI AUTO SUGGESTIONS
+// ================================================================
+let aiSuggestions = [];
+let loadingSuggestions = false;
+
+async function loadAiSuggestions() {
+    if (loadingSuggestions) return;
+    loadingSuggestions = true;
+    renderContent();
+    try {
+        const res = await fetch('/api/ai-suggestions', { headers: authHeaders() });
+        if (res.status === 200) {
+            const data = await res.json();
+            aiSuggestions = data.suggestions || [];
+        } else {
+            console.error('Failed to load AI suggestions:', res.statusText);
+        }
+    } catch (e) {
+        console.error('Error loading AI suggestions:', e);
+    } finally {
+        loadingSuggestions = false;
+        renderContent();
+    }
+}
+
+function applyAiSuggestion(category, issueName, keywords) {
+    if (!taxonomy[category]) return;
+    if (!taxonomy[category].issues[issueName]) {
+        taxonomy[category].issues[issueName] = [];
+    }
+    const existing = taxonomy[category].issues[issueName];
+    keywords.forEach(kw => {
+        const word = String(kw).trim().toLowerCase();
+        if (word && !existing.includes(word)) existing.push(word);
+    });
+    selectedCategory = category;
+    renderContent();
+    alert(`Successfully applied proposed issue "${issueName}" and keywords under category "${category}"!`);
+}
+
+// ================================================================
+// METRICS
+// ================================================================
+function getMetrics() {
+    const total = feedbackList.length;
+    const resolved = feedbackList.filter(f => f.status === 'Resolved').length;
+    const unresolved = total - resolved;
+    const resolutionRate = total > 0 ? ((resolved / total) * 100).toFixed(1) : 0;
+    return { total, unresolved, resolutionRate: `${resolutionRate}%`, newCount: feedbackList.filter(f => f.status === 'Not contact yet').length };
+}
+
+function getDepartmentStats() {
+    const stats = { 'Logistics Team': { total: 0, resolved: 0 }, 'Quality Assurance Team': { total: 0, resolved: 0 }, 'Finance Team': { total: 0, resolved: 0 }, 'IT / Dev Team': { total: 0, resolved: 0 }, 'CRM Management': { total: 0, resolved: 0 } };
+    const normDept = d => { const v = String(d||'').toLowerCase().trim(); if(v.includes('logistics')) return 'Logistics Team'; if(v.includes('quality')) return 'Quality Assurance Team'; if(v.includes('finance')) return 'Finance Team'; if(v.includes('it')) return 'IT / Dev Team'; if(v.includes('crm')) return 'CRM Management'; return null; };
+    feedbackList.forEach(item => {
+        String(item.dept||'').split(/[,;\/]+|\s+and\s+|\s*&\s*/i).map(d=>normDept(d.trim())).filter(Boolean).forEach(d => {
+            if (stats[d]) { stats[d].total++; if (/resolved/i.test(item.status)) stats[d].resolved++; }
+        });
+    });
+    return stats;
+}
+
+// ================================================================
+// BADGE HELPERS
+// ================================================================
+function getCategoryBadgeClasses(cat) {
+    const c = String(cat||'').toLowerCase();
+    if (c.includes('shipping')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (c.includes('quality')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (c.includes('refund')) return 'bg-sky-50 text-sky-700 border-sky-200';
+    if (c.includes('technical')||c.includes('tech')) return 'bg-violet-50 text-violet-700 border-violet-200';
+    return 'bg-rose-50 text-rose-700 border-rose-200';
+}
+function getIssueBadgeClasses(issue, cat) {
+    const n = String(issue||'').toLowerCase();
+    if (n.includes('delivery')||n.includes('tracking')||n.includes('late')) return 'bg-amber-50 text-amber-700 border-amber-200';
+    if (n.includes('defect')||n.includes('broken')||n.includes('wrong item')||n.includes('does not match')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (n.includes('refund')||n.includes('return')||n.includes('amount')) return 'bg-sky-50 text-sky-700 border-sky-200';
+    if (n.includes('app')||n.includes('crash')||n.includes('checkout')||n.includes('payment')||n.includes('promo')) return 'bg-violet-50 text-violet-700 border-violet-200';
+    return getCategoryBadgeClasses(cat);
+}
+function splitBadges(val) { return String(val||'').split(/[,;\/]+|\s+and\s+|\s*&\s*/i).map(s=>s.trim()).filter(Boolean); }
+function formatCategoryBadges(cat) { return splitBadges(cat).map(l=>`<span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${getCategoryBadgeClasses(l)}">${l}</span>`).join(' '); }
+function formatIssueBadges(issue, cat) { return splitBadges(issue).map(l=>`<span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${getIssueBadgeClasses(l,cat)}">${l}</span>`).join(' '); }
+
+// ================================================================
+// MENU
+// ================================================================
+function initMenu() {
+    const menu = document.getElementById('menu');
+    menu.innerHTML = '';
+    menuItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = `nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium ${item.name === currentTab ? 'active' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`;
+        btn.innerHTML = `${item.icon}<span>${item.name}</span>`;
+        btn.onclick = () => switchPage(item.name);
+        menu.appendChild(btn);
+    });
+}
+
+function switchPage(name) {
+    currentTab = name;
+    document.getElementById('page-title').textContent = `${name}`;
+    initMenu();
+    if (name === 'Chat') {
+        const chans = getManagerChannelConfig();
+        if (chans.length) {
+            if (!activeChat || !chans.some(c => c.slug === activeChat)) activeChat = chans[0].slug;
+            loadChatMessages(activeChat).then(() => renderContent());
+            return;
+        }
+    } else if (name === 'Settings') {
+        loadAiSuggestions();
+    }
+    renderContent();
+}
+
+// ================================================================
+// MODAL
+// ================================================================
+function openEditModal(type, category, issue) {
+    modalState = { type, category, issue };
+    const modal = document.getElementById('edit-modal');
+    const title = document.getElementById('edit-modal-title');
+    const body = document.getElementById('edit-modal-body');
+    title.textContent = type === 'category' ? `Edit Category — ${category}` : `Edit Issue — ${issue}`;
+
+    if (type === 'category') {
+        const cat = taxonomy[category] || { department: '', issues: {} };
+        body.innerHTML = `<div class="space-y-4">
+            <div><label class="block text-xs font-semibold text-slate-500 mb-1.5">Category Name</label><input id="modal-category-name" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-400" value="${category}" /></div>
+            <div><label class="block text-xs font-semibold text-slate-500 mb-1.5">Assigned Department</label><input id="modal-department" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-400" value="${cat.department||''}" /></div>
+            <div><label class="block text-xs font-semibold text-slate-500 mb-1.5">Issues</label><div id="modal-issues-list" class="space-y-2 max-h-40 overflow-auto mb-3"></div>
+                <input id="modal-new-issue" placeholder="New issue name" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none focus:border-orange-400" />
+                <input id="modal-new-issue-keywords" placeholder="Comma-separated keywords" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-400" />
+                <button onclick="(function(){ const name=document.getElementById('modal-new-issue').value.trim(); const keys=document.getElementById('modal-new-issue-keywords').value.split(',').map(k=>k.trim()).filter(Boolean); const catName=document.getElementById('modal-category-name').value||'${category}'; if(!taxonomy[catName]) taxonomy[catName]={department:'',issues:{}}; if(name){ taxonomy[catName].issues[name]=keys; document.getElementById('modal-new-issue').value=''; document.getElementById('modal-new-issue-keywords').value=''; window.renderModalIssues(); renderContent(); } })()" class="mt-2 px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold w-full hover:bg-orange-600 transition-colors">Add Issue</button>
+            </div>
+            <div class="flex gap-2 justify-end pt-2 border-t border-slate-100"><button onclick="closeEditModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">Cancel</button><button onclick="saveEditModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700">Save</button></div>
+        </div>`;
+        function renderModalIssues() {
+            const list = document.getElementById('modal-issues-list');
+            const catName = document.getElementById('modal-category-name').value || category;
+            const issues = (taxonomy[catName]||cat).issues||{};
+            list.innerHTML = Object.keys(issues).map(n=>`<div class="flex items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-xl"><span class="text-xs font-semibold">${n}</span><div class="flex gap-1.5"><button onclick="openEditModal('issue','${category}','${n}')" class="px-2.5 py-1 text-xs border border-slate-200 rounded-lg hover:bg-slate-100">Edit</button><button onclick="(function(){ const catN=document.getElementById('modal-category-name').value||'${category}'; delete taxonomy[catN].issues['${n}']; window.renderModalIssues(); renderContent(); })()" class="px-2.5 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600">Delete</button></div></div>`).join('');
+        }
+        window.renderModalIssues = renderModalIssues;
+        setTimeout(renderModalIssues, 0);
+    } else if (type === 'issue') {
+        const keywords = (taxonomy[category]?.issues?.[issue]) || [];
+        body.innerHTML = `<div class="space-y-4">
+            <div><label class="block text-xs font-semibold text-slate-500 mb-1.5">Issue Name</label><input id="modal-issue-name" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-400" value="${issue}" /></div>
+            <div><label class="block text-xs font-semibold text-slate-500 mb-1.5">Keywords (comma separated)</label><input id="modal-issue-keywords" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-400" value="${keywords.join(', ')}" /></div>
+            <div class="flex gap-2 justify-end pt-2 border-t border-slate-100"><button onclick="closeEditModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">Cancel</button><button onclick="saveEditModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700">Save</button></div>
+        </div>`;
+    }
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.replace('flex','hidden');
+    modalState = {};
+}
+
+function saveEditModal() {
+    if (!modalState.type) return closeEditModal();
+    if (modalState.type === 'category') {
+        const oldName = modalState.category;
+        const newName = document.getElementById('modal-category-name').value.trim();
+        const newDept = document.getElementById('modal-department').value.trim();
+        if (!newName) return alert('Category name required');
+        if (newName !== oldName) { taxonomy[newName] = taxonomy[oldName]; taxonomy[newName].department = newDept; delete taxonomy[oldName]; if (selectedCategory===oldName) selectedCategory=newName; }
+        else taxonomy[oldName].department = newDept;
+    } else {
+        const { category, issue } = modalState;
+        const newIssue = document.getElementById('modal-issue-name').value.trim();
+        const keywords = document.getElementById('modal-issue-keywords').value.split(',').map(k=>k.trim()).filter(Boolean);
+        if (!newIssue) return alert('Issue name required');
+        taxonomy[category].issues[newIssue] = keywords;
+        if (newIssue !== issue) delete taxonomy[category].issues[issue];
+    }
+    renderContent();
+    closeEditModal();
+}
+
+function handleAddKeyword(issueName) {
+    if (!newKeywordInput.trim()) return;
+    const kw = newKeywordInput.trim().toLowerCase();
+    const cur = taxonomy[selectedCategory].issues[issueName];
+    if (!cur.includes(kw)) taxonomy[selectedCategory].issues[issueName] = [...cur, kw];
+    newKeywordInput = '';
+    renderContent();
+}
+
+function handleRemoveKeyword(issueName, kw) {
+    taxonomy[selectedCategory].issues[issueName] = taxonomy[selectedCategory].issues[issueName].filter(k=>k!==kw);
+    renderContent();
+}
+
+function setSelectedCategory(cat) { selectedCategory = cat; renderContent(); }
+
+// ================================================================
+// DEPARTMENT PERMISSIONS
+// ================================================================
+function getEditableCategories() {
+    const dept = (localStorage.getItem('department') || '').trim();
+    if (dept === 'Head of Manager') return Object.keys(taxonomy);
+    
+    // Map user departments to taxonomy categories
+    const mapping = {
+        'Logistics': ['Shipping'],
+        'Quality Assurance': ['Quality'],
+        'Finance': ['Refund'],
+        'IT support': ['Technical'],
+        'CRM manager': ['Others']
+    };
+    
+    return mapping[dept] || [];
+}
+
+// ================================================================
+// LOGOUT MODAL
+// ================================================================
+function showLogoutConfirm() {
+    document.getElementById('logout-modal').classList.remove('hidden');
+    document.getElementById('logout-modal').classList.add('flex');
+}
+
+function hideLogoutConfirm() {
+    document.getElementById('logout-modal').classList.add('hidden');
+    document.getElementById('logout-modal').classList.remove('flex');
+}
+
+function executeLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('username');
+    localStorage.removeItem('department');
+    window.location.href = 'login.html';
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderContent() {
+    captureChatDraft();
+    const content = document.getElementById('content');
+    const metrics = getMetrics();
+    const deptStats = getDepartmentStats();
+
+    const recentRows = feedbackList.length === 0
+        ? ''
+        : feedbackList.slice(0, 4).map(item=>`
+        <tr class="hover:bg-slate-50/60 transition-colors border-b border-slate-50">
+            <td class="px-5 py-3.5 text-xs font-bold text-slate-700">${escapeHtml(item.id)}</td>
+            <td class="px-5 py-3.5 text-xs text-slate-400 font-medium whitespace-nowrap">${escapeHtml(item.time)}</td>
+            <td class="px-5 py-3.5 text-sm font-bold text-slate-800">${escapeHtml(item.user)}</td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">${escapeHtml(item.category)}</td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">${escapeHtml(item.issue)}</td>
+            <td class="px-5 py-3.5 text-xs font-semibold text-slate-600">${escapeHtml(item.dept)}</td>
+            <td class="px-5 py-3.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full ${item.status==='Resolved'?'bg-green-500':item.status==='In process'?'bg-blue-500':'bg-orange-400'}"></span>
+                    <span class="text-xs font-semibold text-slate-600">${escapeHtml(item.status)}</span>
+                </div>
+            </td>
+        </tr>`).join('');
+    const deptLabel = escapeHtml(localStorage.getItem('department') || 'your department');
+    const resPct = Math.min(100, Math.max(0, parseFloat(metrics.resolutionRate) || 0));
+
+    if (currentTab === 'Dashboard') {
+        content.innerHTML = `
+        <div class="space-y-6 max-w-7xl mx-auto slide-in">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl border border-slate-700/50 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-5" style="background-image:radial-gradient(circle at 20% 50%, #f97316 0%, transparent 50%), radial-gradient(circle at 80% 20%, #fb923c 0%, transparent 40%)"></div>
+                <div class="relative">
+                    <span class="ai-badge inline-block px-3 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full text-[10px] font-bold tracking-wider uppercase mb-3">Department view</span>
+                    <h2 class="text-xl font-display font-bold tracking-tight mb-1">Welcome, ${deptLabel}</h2>
+                    <p class="text-xs text-slate-400 max-w-2xl">Tables and metrics below only list <strong class="text-slate-200">customer-submitted feedback</strong> stored in the database for your role. Logistics sees shipping and delivery issues; other departments see their own routed tickets. Head of Manager sees every department.</p>
+                </div>
+            </div>
+
+            <!-- Metrics cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <div class="card-hover bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-400">New feedback</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold text-green-600 bg-green-50">+25%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-display font-black text-slate-900 mb-0.5">${metrics.newCount}</h3>
+                        <p class="text-[10px] font-medium text-slate-400">Inbound streams are active</p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-hover bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-400">Avg. response time</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold text-green-600 bg-green-50">+10% from last week</span>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-display font-black text-slate-900 mb-0.5">1.8m</h3>
+                        <p class="text-[10px] font-medium text-slate-400">Fastest Segment: Logistics</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-hover bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-400">Issue resolution</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold text-green-600 bg-green-50">${metrics.resolutionRate}</span>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-display font-black text-slate-900 mb-0.5">${metrics.resolutionRate}</h3>
+                        <p class="text-[10px] font-medium text-slate-400">Goal: Keep > 90%</p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card-hover bg-emerald-500 p-5 rounded-3xl shadow-sm flex flex-col justify-between h-36 text-white border-none">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-emerald-100">Customer Satisfaction</span>
+                        <span class="text-lg">🤩</span>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-display font-black text-white mb-0.5">Excellent</h3>
+                        <p class="text-[10px] font-medium text-emerald-100/80">Based on resolved rate and team performance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Donut -->
+                <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm lg:col-span-4">
+                    <h3 class="font-display font-bold text-sm text-slate-800 mb-0.5">Resolution Distribution</h3>
+                    <p class="text-[10px] text-slate-400 mb-4">Current active operational state ratios</p>
+                    <div class="flex items-center justify-center py-2 relative">
+                        <svg width="160" height="160" viewBox="0 0 42 42" class="transform -rotate-90">
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f1f5f9" stroke-width="4"/>
+                            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="4.5" stroke-dasharray="${resPct} ${100-resPct}" stroke-dashoffset="0" stroke-linecap="round"/>
+                        </svg>
+                        <div class="absolute flex flex-col items-center">
+                            <span class="text-2xl font-display font-black text-slate-900">${metrics.resolutionRate}</span>
+                            <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Resolved</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 mt-4 pt-4 border-t border-slate-50 text-center">
+                        ${[['bg-green-500','Resolved',feedbackList.filter(f=>f.status==='Resolved').length],['bg-blue-500','In process',feedbackList.filter(f=>f.status==='In process').length],['bg-orange-400','Unopened',feedbackList.filter(f=>f.status==='Not contact yet').length]].map(([c,l,n])=>`<div><span class="inline-block w-1.5 h-1.5 rounded-full ${c} mr-1"></span><span class="text-[10px] font-semibold text-slate-500 block">${l}</span><span class="text-[10px] text-slate-400">${n} Cases</span></div>`).join('')}
+                    </div>
+                </div>
+                <!-- Progress bars -->
+                <div class="card-hover bg-white p-6 rounded-3xl border border-slate-100 shadow-sm lg:col-span-8">
+                    <h3 class="font-display font-bold text-sm text-slate-800 mb-0.5">Performance Summary</h3>
+                    <p class="text-[10px] text-slate-400 mb-5">Incidents auto-routed and mapped across active operational teams</p>
+                    <div class="space-y-4">
+                        ${Object.entries(deptStats).map(([dept,s])=>{
+                            const pct = s.total > 0 ? ((s.resolved/s.total)*100).toFixed(0) : 0;
+                            return `<div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1.5">
+                                    <span>${dept}</span>
+                                    <span class="text-slate-400">${s.total} total · <span class="text-emerald-600 font-bold">${pct}% resolved</span></span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-orange-400 to-amber-400 h-full rounded-full status-bar-anim" style="width:${s.total>0?(s.resolved/s.total)*100:0}%"></div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+
+            ${feedbackList.length ? `
+            <!-- Recent table -->
+            <div class="card-hover bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-display font-bold text-sm text-slate-800">Latest Feedback</h3>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Most recent inbound messages (database)</p>
+                    </div>
+                    <button onclick="switchPage('Feedback')" class="text-orange-500 text-xs font-bold hover:underline">View all →</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead><tr class="bg-slate-50 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-100">
+                            <th class="px-5 py-3">ID</th><th class="px-5 py-3">Time</th><th class="px-5 py-3">Customer</th><th class="px-5 py-3">Category</th><th class="px-5 py-3">Issue</th><th class="px-5 py-3">Assigned to</th><th class="px-5 py-3">Status</th>
+                        </tr></thead>
+                        <tbody>${recentRows}</tbody>
+                    </table>
+                </div>
+            </div>` : `
+            <div class="bg-white border border-dashed border-slate-200 rounded-3xl p-10 text-center text-slate-500 text-sm">
+                No customer feedback has been submitted yet for your view. When customers send tickets, they will appear here and under Feedback.
+            </div>`}
+        </div>`;
+
+    } else if (currentTab === 'Feedback') {
+        content.innerHTML = feedbackList.length === 0 ? `
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-12 max-w-7xl mx-auto slide-in text-center text-slate-500 text-sm">
+            <p class="font-display font-bold text-slate-700 mb-2">No feedback to display</p>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">Customer tickets are loaded from the database. Nothing is shown until customers submit feedback (or seed data exists for your department).</p>
+        </div>` : `
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 max-w-7xl mx-auto slide-in">
+            <div class="flex justify-between items-center mb-5">
+                <div>
+                    <h2 class="font-display font-bold text-base text-slate-800">Master Feedback Log</h2>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Stored customer messages and routing (rule-based classification)</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold">Total: ${feedbackList.length}</span>
+                    <span class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold">Unresolved: ${metrics.unresolved}</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto border border-slate-100 rounded-2xl">
+                <table class="w-full text-left">
+                    <thead><tr class="bg-slate-50 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-100">
+                        <th class="px-5 py-3.5">Order ID</th><th class="px-5 py-3.5">Timestamp</th><th class="px-5 py-3.5">Customer</th><th class="px-5 py-3.5 min-w-[220px]">Message</th><th class="px-5 py-3.5">Category</th><th class="px-5 py-3.5">Issue</th><th class="px-5 py-3.5 min-w-[130px]">Status</th>
+                    </tr></thead>
+                    <tbody>
+                        ${feedbackList.map(item=>`
+                        <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                            <td class="px-5 py-3.5 text-xs font-bold text-slate-700">${escapeHtml(item.id)}</td>
+                            <td class="px-5 py-3.5 text-[10px] text-slate-400 whitespace-nowrap font-medium">${escapeHtml(item.time)}</td>
+                            <td class="px-5 py-3.5 text-sm font-bold text-slate-800 whitespace-nowrap">${escapeHtml(item.user)}</td>
+                            <td class="px-5 py-3.5 text-[10px] text-slate-500 max-w-[220px] leading-relaxed">${escapeHtml(item.text)}</td>
+                            <td class="px-5 py-3.5"><div class="flex flex-wrap gap-1">${formatCategoryBadges(item.category)}</div></td>
+                            <td class="px-5 py-3.5"><div class="flex flex-wrap gap-1">${formatIssueBadges(item.issue, item.category)}</div></td>
+                            <td class="px-5 py-3.5">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${item.status==='Resolved'?'bg-green-50 border-green-100 text-green-700':item.status==='In process'?'bg-blue-50 border-blue-100 text-blue-700':'bg-orange-50 border-orange-100 text-orange-700'}">${escapeHtml(item.status)}</span>
+                            </td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+
+    } else if (currentTab === 'Process') {
+        content.innerHTML = feedbackList.length === 0 ? `
+        <div class="max-w-7xl mx-auto slide-in">
+            <div class="bg-white p-12 rounded-3xl border border-slate-100 text-center text-slate-500 text-sm">
+                No lifecycle data yet. Process steps appear when there is customer feedback in the database.
+            </div>
+        </div>` : `
+        <div class="max-w-7xl mx-auto slide-in">
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <h2 class="font-display font-bold text-base text-slate-800 mb-1">Feedback Resolution Lifecycle</h2>
+                <p class="text-[10px] text-slate-400 mb-6">Trace how each ticket progresses from ingest to resolution</p>
+                <div class="space-y-3">
+                    ${feedbackList.map(item=>`
+                    <div class="p-4 border border-slate-100 bg-slate-50/30 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-slate-200 transition-colors">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-black text-slate-400">${escapeHtml(item.id)}</span>
+                                <span class="text-sm font-bold text-slate-800">${escapeHtml(item.user)}</span>
+                                <span class="text-[10px] px-2 py-0.5 bg-orange-100 text-orange-600 font-bold rounded-lg">${escapeHtml(item.category)}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-500 font-medium">${escapeHtml(item.issue)} → <span class="text-orange-500 font-semibold">${escapeHtml(item.dept)}</span></p>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            ${[['Ingest',true],['Routed',item.status!=='Not contact yet'],['Resolved',item.status==='Resolved']].map(([label,done],i)=>`
+                            <div class="flex items-center gap-1">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black ${done?'bg-green-500 text-white':'bg-slate-200 text-slate-400'}">${i+1}</div>
+                                <span class="text-[9px] text-slate-400 font-bold hidden lg:block">${label}</span>
+                            </div>
+                            ${i<2?`<div class="w-6 h-0.5 ${done&&[['Ingest',true],['Routed',item.status!=='Not contact yet'],['Resolved',item.status==='Resolved']][i+1]?.[1]?'bg-green-500':'bg-slate-200'}"></div>`:''}
+                            `).join('')}
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>
+        </div>`;
+
+    } else if (currentTab === 'Settings') {
+        const editableCats = getEditableCategories();
+        if (!editableCats.includes(selectedCategory)) {
+            selectedCategory = editableCats[0] || null;
+        }
+
+        const username = escapeHtml(localStorage.getItem('username') || 'Manager');
+        const role = escapeHtml(localStorage.getItem('role') || 'Manager');
+        const dept = escapeHtml(localStorage.getItem('department') || 'Unassigned');
+
+        content.innerHTML = `
+        <div class="max-w-7xl mx-auto slide-in space-y-6">
+            <!-- Personal Info -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <h2 class="font-display font-bold text-base text-slate-800 mb-4">Personal Info</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Username</label>
+                        <div class="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-semibold text-slate-800">${username}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Role / Department</label>
+                        <div class="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-semibold text-slate-800 capitalize">${role} — ${dept}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Password</label>
+                        <div class="px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-semibold text-slate-800">********</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="font-display font-bold text-base text-slate-800">Theme Preferences</h2>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Toggle between light and dark modes</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-slate-500">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="mgr-dark-mode-toggle" onchange="toggleManagerDarkMode(this.checked)" ${localStorage.getItem('mgr-dark-mode')==='true'?'checked':''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Edit Patterns -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="mb-5">
+                    <h2 class="font-display font-bold text-base text-slate-800">Pattern Config Editor</h2>
+                    <p class="text-[10px] text-slate-400">Manage keyword rules used by the classification engine. You can only edit categories assigned to your department.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <div class="md:col-span-3 space-y-1.5 border-r border-slate-100 pr-4">
+                        <span class="text-[10px] font-bold text-slate-400 block mb-3 uppercase tracking-widest">Categories</span>
+                        ${editableCats.length > 0 ? editableCats.map(cat=>`
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="setSelectedCategory('${cat}')" class="flex-1 text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${selectedCategory===cat?'bg-orange-500 text-white shadow-md shadow-orange-200':'text-slate-600 hover:bg-slate-100'}">${cat}</button>
+                            <button onclick="openEditModal('category','${cat}')" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 text-sm">✎</button>
+                        </div>`).join('') : '<p class="text-xs text-slate-500">No categories assigned to your department.</p>'}
+                    </div>
+                    <div class="md:col-span-9 space-y-4">
+                        ${selectedCategory && taxonomy[selectedCategory] ? `
+                        <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-2xl">
+                            <div><span class="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Assigned Team</span><span class="text-sm font-black text-slate-800">${taxonomy[selectedCategory].department}</span></div>
+                            <span class="px-2.5 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-lg uppercase">Active</span>
+                        </div>
+                        ${Object.entries(taxonomy[selectedCategory].issues).map(([issueName,keywords])=>`
+                        <div class="p-4 border border-slate-100 rounded-2xl bg-white space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-bold text-slate-700">${issueName}</span>
+                                <span class="text-[10px] text-slate-400 font-semibold">${keywords.length} keywords</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${keywords.map(w=>`<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-50 border border-orange-100 rounded-full text-[10px] font-bold text-orange-600">${w}<button onclick="handleRemoveKeyword('${issueName}','${w.replace(/'/g,"\\'")}')">×</button></span>`).join('')}
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <input type="text" placeholder="Add keyword..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-orange-400" value="${newKeywordInput}" oninput="newKeywordInput=this.value" onkeydown="if(event.key==='Enter'){handleAddKeyword('${issueName}');event.preventDefault();}" />
+                                <button onclick="handleAddKeyword('${issueName}')" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition-colors">Add</button>
+                            </div>
+                        </div>`).join('')}
+                        ` : `<div class="p-6 text-center text-slate-500 text-sm">Select a category to edit</div>`}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automatic AI Suggestions -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="font-display font-bold text-base text-slate-800">Automatic Suggestion</h2>
+                        <p class="text-[10px] text-slate-400 mt-0.5">GPT-powered recommendations compiled from unresolved customer inquiries in the "Others" category</p>
+                    </div>
+                    <button onclick="loadAiSuggestions()" class="px-3.5 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+                ${loadingSuggestions ? `
+                <div class="py-12 flex flex-col items-center justify-center space-y-3">
+                    <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-xs font-bold text-slate-400">Analyzing uncategorized messages...</span>
+                </div>
+                ` : aiSuggestions.length > 0 ? `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${aiSuggestions.map((s, idx) => {
+                        const targetCat = s.department_category; // Shipping, Quality, Refund, Technical
+                        const isEditable = getEditableCategories().includes(targetCat);
+                        
+                        return `
+                        <div class="p-4 border border-slate-100 rounded-2xl bg-slate-50/50 space-y-3 flex flex-col justify-between">
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-start">
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-bold rounded-lg uppercase">${targetCat}</span>
+                                    <span class="text-[9px] text-slate-400 font-semibold font-display">Theme: ${s.suggested_issue}</span>
+                                </div>
+                                <h4 class="text-sm font-bold text-slate-800 font-display">${s.suggested_issue}</h4>
+                                <p class="text-xs text-slate-500">${s.reason}</p>
+                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                    ${s.keywords.map(kw => `<span class="px-2 py-0.5 bg-orange-50 border border-orange-100 rounded-full text-[10px] font-bold text-orange-600">${kw}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-100/50 flex justify-between items-center">
+                                <span class="text-[9px] text-slate-400 font-medium">Keywords to add</span>
+                                ${isEditable ? `
+                                <button onclick="applyAiSuggestion('${targetCat}', '${s.suggested_issue.replace(/'/g, "\\'")}', [${s.keywords.map(k => `'${k.replace(/'/g, "\\'")}'`).join(',')}])" class="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-100">
+                                    Apply Rules
+                                </button>
+                                ` : `
+                                <span class="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-1 rounded-lg">No Access</span>
+                                `}
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                ` : `
+                <div class="py-6 text-center text-slate-400 text-xs">No unresolved tickets in "Others" available for AI analysis. Click Refresh to check again.</div>
+                `}
+            </div>
+
+            <!-- Logout Section -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="font-display font-bold text-base text-slate-800">Account Actions</h2>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Log out of your manager account safely</p>
+                </div>
+                <button onclick="showLogoutConfirm()" class="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-colors">Log Out</button>
+            </div>
+        </div>`;
+
+    } else if (currentTab === 'Chat') {
+        const chans = getManagerChannelConfig();
+        if (!chans.length) {
+            content.innerHTML = `<div class="max-w-7xl mx-auto p-12 bg-white rounded-3xl border border-slate-100 text-center text-slate-500 text-sm slide-in">No department is assigned to your account. Update your profile or sign up again with a department (Logistics, Quality Assurance, Finance, IT support, CRM manager, or Head of Manager).</div>`;
+        } else {
+            const me = localStorage.getItem('username') || 'Manager';
+            const cur = chans.find(c => c.slug === activeChat) || chans[0];
+            const msgs = chatMessagesBySlug[activeChat] || [];
+            const rowAlign = (sender) => (sender === me ? 'justify-end' : 'justify-start');
+            const rowClass = (sender) => {
+                if (sender === 'System') return 'bg-slate-800 text-white border border-slate-700 rounded-2xl';
+                if (sender === me) return 'bg-orange-500 text-white rounded-tr-none shadow-md shadow-orange-100';
+                return 'bg-white text-slate-800 rounded-tl-none border border-slate-100 shadow-sm';
+            };
+            content.innerHTML = `
+        <div class="max-w-7xl mx-auto h-[620px] bg-white rounded-3xl border border-slate-100 shadow-sm flex overflow-hidden slide-in">
+            <div class="w-72 border-r border-slate-100 flex flex-col flex-shrink-0">
+                <div class="p-4 border-b border-slate-50 bg-slate-50/50">
+                    <span class="text-[10px] font-bold text-slate-400 block mb-0.5 uppercase tracking-widest">Channels</span>
+                    <p class="text-[10px] text-slate-400 font-medium">Department threads (database)</p>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                    ${chans.map(ch => {
+                        const last = (chatMessagesBySlug[ch.slug] || []).slice(-1)[0];
+                        const preview = last ? escapeHtml(last.message).substring(0, 42) : 'No messages yet';
+                        return `
+                    <button type="button" onclick="setActiveChatSlug('${ch.slug}')" class="w-full p-3 rounded-2xl text-left flex items-center gap-3 transition-all ${activeChat === ch.slug ? 'bg-orange-50 border border-orange-100' : 'hover:bg-slate-50'}">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-black text-xs text-white flex-shrink-0 ${ch.color}">${escapeHtml(ch.label.charAt(0))}</div>
+                        <div class="overflow-hidden">
+                            <p class="text-xs font-bold text-slate-800">${escapeHtml(ch.label)}</p>
+                            <p class="text-[9px] text-slate-400 truncate">${preview}…</p>
+                        </div>
+                    </button>`;
+                    }).join('')}
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/40">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm ${cur.color}">${escapeHtml(cur.label.charAt(0))}</div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-800">${escapeHtml(cur.label)}</p>
+                        <p class="text-[10px] text-green-500 flex items-center gap-1 font-semibold"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>Thread</p>
+                    </div>
+                </div>
+                <div class="flex-1 p-5 overflow-y-auto space-y-3 bg-slate-50/20" id="mgr-chat-scroll">
+                    ${msgs.map(msg => `
+                    <div class="flex ${rowAlign(msg.sender)}">
+                        <div class="p-3.5 rounded-2xl max-w-sm ${rowClass(msg.sender)}">
+                            <p class="text-[9px] font-bold mb-1 opacity-60">${escapeHtml(msg.sender)}</p>
+                            <p class="text-xs font-medium leading-relaxed">${escapeHtml(msg.message)}</p>
+                            <p class="text-[8px] text-right mt-1.5 opacity-50">${escapeHtml(msg.time)}</p>
+                        </div>
+                    </div>`).join('')}
+                </div>
+                <div class="p-4 border-t border-slate-100 flex gap-2 bg-white">
+                    <input id="mgr-chat-input" type="text" placeholder="Message ${escapeHtml(cur.label)}..." class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-xs focus:outline-none focus:border-orange-400 transition-colors" value="${escapeHtml(typedMessage)}" oninput="typedMessage=this.value" onkeydown="if(event.key==='Enter'){handleSendChatMessage();}" />
+                    <button type="button" onclick="handleSendChatMessage()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-2xl shadow-lg shadow-orange-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+            requestAnimationFrame(() => {
+                const sc = document.getElementById('mgr-chat-scroll');
+                if (sc) sc.scrollTop = sc.scrollHeight;
+            });
+        }
+    }
+}
+
+window.toggleManagerDarkMode = function(checked) {
+    const appContainer = document.getElementById('app');
+    if (checked) {
+        if (appContainer) appContainer.classList.add('dark-theme');
+        localStorage.setItem('mgr-dark-mode', 'true');
+    } else {
+        if (appContainer) appContainer.classList.remove('dark-theme');
+        localStorage.setItem('mgr-dark-mode', 'false');
+    }
+};
+
+// Init — require manager session and load tickets from API
+(async function bootstrap() {
+    // Initialize Dark Mode state
+    const isDarkMode = localStorage.getItem('mgr-dark-mode') === 'true';
+    const appContainer = document.getElementById('app');
+    if (isDarkMode && appContainer) {
+        appContainer.classList.add('dark-theme');
+    }
+
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'manager') {
+        window.location.href = 'login.html';
+        return;
+    }
+    const su = document.getElementById('sidebar-username');
+    const sd = document.getElementById('sidebar-department');
+    if (su) su.textContent = localStorage.getItem('username') || 'Manager';
+    if (sd) sd.textContent = localStorage.getItem('department') || 'No department set';
+    await loadFeedback();
+    const chans = getManagerChannelConfig();
+    if (chans.length) {
+        if (!activeChat || !chans.some(c => c.slug === activeChat)) activeChat = chans[0].slug;
+        await loadChatMessages(activeChat);
+    }
+    initMenu();
+    renderContent();
+})();
+</script>
+</body>
+</html>
