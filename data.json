@@ -1,5 +1,43 @@
 {
-    "project": "Fresh Start",
-    "version": "1.0.0",
-    "data": []
+  "stats": {
+    "newFeedbackCount": 1,
+    "avgResponseTime": "1.8m",
+    "issueResolution": {
+      "resolved": 91.4,
+      "inProcess": 5.7,
+      "notContacted": 2.9
+    }
+  },
+  "performance": [
+    { "team": "Quality Assurance", "value": 11, "height": 80 },
+    { "team": "Logistics", "value": 12, "height": 90 },
+    { "team": "IT Support", "value": 9, "height": 65 },
+    { "team": "Finance", "value": 10, "height": 75 },
+    { "team": "CRM Management", "value": 4, "height": 30 }
+  ],
+  "latestFeedback": [
+    { "timestamp": "09:41, 14/05/2026", "customer": "Daniel Nguyen", "category": "Shipping", "issue": "Late delivery", "assignedTo": "Logistics Team" },
+    { "timestamp": "13:47, 13/05/2026", "customer": "Sophia Tran", "category": "Product Quality, Refund & Return", "issue": "Product defective or broken, Refund taking too long", "assignedTo": "QA & Finance Teams" },
+    { "timestamp": "16:22, 13/05/2026", "customer": "Michael Le", "category": "Technical", "issue": "Payment failed during checkout", "assignedTo": "IT Support Team" }
+  ],
+  "allFeedback": [
+    { "orderId": "#482731", "timestamp": "09:41, 14/05/2026", "customer": "Daniel Nguyen", "category": "Shipping", "issue": "Late delivery", "process": "Not contact yet", "assignedTo": "Logistics" },
+    { "orderId": "#615204", "timestamp": "13:47, 13/05/2026", "customer": "Sophia Tran", "category": "Product Quality...", "issue": "Product defective...", "process": "In process", "assignedTo": "QA, Finance" },
+    { "orderId": "#903118", "timestamp": "16:22, 13/05/2026", "customer": "Michael Le", "category": "Technical", "issue": "Payment failed...", "process": "In process", "assignedTo": "IT Support" },
+    { "orderId": "#274590", "timestamp": "12/5/2026 10:05", "customer": "Emma Pham", "category": "Shipping, QA...", "issue": "Package arrived damaged...", "process": "Dissolved", "assignedTo": "Logistics" },
+    { "orderId": "#781463", "timestamp": "12/5/2026 18:31", "customer": "Liam Hoang", "category": "Others", "issue": "Not detected", "process": "Dissolved", "assignedTo": "CRM Management" }
+  ],
+  "editor": [
+    { "category": "Shipping", "issue": "Late delivery", "keyword": "delay" },
+    { "category": "Shipping", "issue": "Late delivery", "keyword": "still hasn't arrived" },
+    { "category": "Shipping", "issue": "Late delivery", "keyword": "overdue" },
+    { "category": "Shipping", "issue": "Package damaged", "keyword": "broken box" },
+    { "category": "Technical", "issue": "App crashes", "keyword": "not opening" }
+  ],
+  "chatHistory": [
+    { "text": "Hey! We just got a new complaint (ID: #482731) about a late delivery for Daniel Nguyen. Can you check the status?", "type": "sent" },
+    { "text": "Checking now. It looks like it's stuck at the regional hub due to the weather.", "type": "received", "avatar": "L" },
+    { "text": "Got it. The customer is quite upset. Can we prioritize this once the weather clears?", "type": "sent" },
+    { "text": "I'll inform the staff and reach out asap", "type": "received", "avatar": "L" }
+  ]
 }
